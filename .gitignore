@@ -1,23 +1,30 @@
-# Virtual environment
+# Node / frontend
+node_modules/
+dist/
+build/
+.vite/
+
+# Python / backend
 venv/
 env/
 .venv/
-
-# Environment variables (contains your API keys!)
-.env
-
-# Python cache
 __pycache__/
 *.pyc
-*.pyo
 
-# Jupyter checkpoints
+# Environment variables (contains real API keys!)
+.env
+**/.env
+!.env.example
+
+# Jupyter
 .ipynb_checkpoints/
 
-# OS files
+# OS / editor
 .DS_Store
 Thumbs.db
-
-# IDE
 .vscode/
-.idea/.env
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
