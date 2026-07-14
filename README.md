@@ -1,46 +1,84 @@
-# Neural Console -  Agent
+<div align="center">
 
-A lightweight, full-stack interface for a Langchain-powered AI agent. The
-agent can search the web for current events and fetch live weather data,
-and this project wraps it in a proper chat UI instead of a notebook cell —
-so it's usable, demoable, and easy to extend.
+# 🧠 Neural Console
+### A conversational interface for an autonomous AI agent
 
-Two pieces:
+*Real-time reasoning, live web search, and weather awareness — wrapped in a clean, animated chat UI.*
 
-```
-agent-ui-project/
-├── backend/     FastAPI wrapper around your existing agent (agent_server.py)
-└── frontend/    React + Vite + Tailwind + Framer Motion chat UI
-```
+![Python](https://img.shields.io/badge/Python-3.12-blue?logo=python&logoColor=white)
+![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)
+![FastAPI](https://img.shields.io/badge/FastAPI-backend-009688?logo=fastapi&logoColor=white)
+![LangGraph](https://img.shields.io/badge/LangGraph-agent-1C3C3C)
+![License](https://img.shields.io/badge/license-MIT-lightgrey)
 
-Your original agent logic is untouched — `agent_server.py` just puts an HTTP
-endpoint (`POST /api/chat`) in front of the same `create_agent` setup, tools,
-and retry wrapper from your script.
+</div>
+
+---
+
+## What is this?
+
+Most LangChain agent demos live and die inside a Jupyter cell. **Neural Console** takes the
+same agent — reasoning over tools, pulling live data, answering in real time — and gives it
+a real home: a FastAPI backend serving a React chat interface, so it's actually usable,
+demoable, and shareable.
+
+The agent can:
+- 🔍 **Search the web** for current events and real-time information
+- 🌦️ **Check live weather** for any city
+- 🧩 **Reason step-by-step** before responding, showing which tools it used
+
+Your original agent logic is untouched — the backend just wraps the same `create_agent`
+setup, tools, and retry logic behind a clean `POST /api/chat` endpoint.
 
 ## Preview
 
+<div align="center">
+
 **Chat interface**
 
-![Neural Console chat UI](img1.png)
+<img src="img1.png" width="720" alt="Neural Console chat UI"/>
 
-**Agent responding with tool usage**
+**Agent responding with visible tool usage**
 
-![Agent response with tool calls](img2.png)
+<img src="img2.png" width="720" alt="Agent response with tool calls"/>
 
-## 1. Backend setup
+</div>
+
+## Architecture
+
+```
+agent-ui-project/
+├── backend/     FastAPI wrapper around the agent  →  agent_server.py
+└── frontend/    React + Vite + Tailwind + Framer Motion chat UI
+```
+
+```
+ ┌────────────┐      POST /api/chat      ┌─────────────────┐      tool calls      ┌──────────────┐
+ │  Frontend  │ ───────────────────────▶ │  FastAPI Server  │ ───────────────────▶ │  LangGraph    │
+ │  (React)   │ ◀─────────────────────── │  (agent_server)  │ ◀─────────────────── │  Agent + LLM  │
+ └────────────┘        response          └─────────────────┘      results          └──────┬───────┘
+                                                                                            │
+                                                                             ┌──────────────┼──────────────┐
+                                                                             ▼                             ▼
+                                                                       Tavily Search               OpenWeatherMap
+```
+
+## Getting started
+
+### 1 · Backend
 
 ```bash
 cd backend
 python -m venv venv
 source venv/bin/activate        # Windows: venv\Scripts\activate
 pip install -r requirements.txt
-cp .env.example .env            # then fill in your real API keys
+cp .env.example .env            # fill in your real API keys
 uvicorn agent_server:app --reload --port 8000
 ```
 
-Check it's alive: open `http://localhost:8000/api/health` — should return `{"status":"ok"}`.
+Verify it's running → `http://localhost:8000/api/health` should return `{"status":"ok"}`.
 
-## 2. Frontend setup
+### 2 · Frontend
 
 ```bash
 cd frontend
@@ -49,27 +87,33 @@ cp .env.example .env            # VITE_API_URL=http://localhost:8000
 npm run dev
 ```
 
-Open the URL Vite prints (usually `http://localhost:5173`).
+Open the URL Vite prints — usually `http://localhost:5173`.
 
-## 3. Using it
+### 3 · Using it
 
-Type a message and hit Enter (Shift+Enter for a new line). The center orb
-pulses while the agent is reasoning, and any tools it used (web search,
-weather lookup) show up as tags above the reply.
+Type a message and hit **Enter** (Shift+Enter for a new line). The center orb pulses while
+the agent reasons, and any tools it used — web search, weather lookup — appear as tags
+above the reply.
 
-## Notes / things to adjust for production
+## Roadmap / production notes
 
-- CORS in `agent_server.py` is wide open (`allow_origins=["*"]`) for local
-  dev. Lock this down to your real frontend domain before deploying.
-- The current `/api/chat` endpoint is request/response, not streaming. If
-  you want token-by-token streaming later, LangGraph's `agent.stream(...)`
-  can be wired into a Server-Sent Events or WebSocket route.
-- Each request currently resends the full conversation history (stateless
-  backend). Fine for a prototype; for production you'd likely persist
-  sessions server-side (Redis/DB) instead.
-- Put real API keys only in `.env` files — never commit them.
+| Area | Current state | For production |
+|---|---|---|
+| **CORS** | Wide open (`allow_origins=["*"]`) | Lock to your real frontend domain |
+| **Streaming** | Request/response only | Wire `agent.stream(...)` into SSE or WebSocket |
+| **Sessions** | Stateless — full history resent each call | Persist sessions server-side (Redis/DB) |
+| **Secrets** | `.env` files, gitignored | Use a secrets manager in deployment |
+
+## Tech stack
+
+**Backend:** Python · FastAPI · LangChain · LangGraph · Google Gemini · Tavily · OpenWeatherMap
+**Frontend:** React · Vite · Tailwind CSS · Framer Motion
 
 ---
 
+<div align="center">
+
 **Kaveesha Madhushan**
-Computer Engineering, University of Peradeniya
+Computer Engineering · University of Peradeniya
+
+</div>
